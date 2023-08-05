@@ -2,7 +2,7 @@
 
 #define MAXOP 20    /* max size of operand, operator to be processed*/
 #define NUMBER '0'  /* symbolic representation of number */
-#define TOOBIG '9'  /* symbolic representation of too big error */
+#define TOOBIG '9'  /* symbolic representation of overflow */
 #define MAXVAL 100  /* max size of our stack */
 #define BUFSIZE 100 /* max size of buffer */
 
