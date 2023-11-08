@@ -1,60 +1,47 @@
-typedef struct string {
-  char *ptr;
-  int count;
-} string;
+#include "lexer.h"
 
-typedef unsigned int u32;
+int is_alpha(u8 token) {
+  if ((token < 'a' || token > 'z') && (token < 'A' || token > 'Z')) {
+    return 0;
+  }
+  return 1;
+}
 
-typedef u32 TokenType;
-enum {
-  TokenType_EOF,
-  TokenType_Plus,
-  TokenType_Minus,
-  TokenType_Star,
-  TokenType_Slash,
-  TokenType_Caret,
-  TokenType_Number,
-  TokenType_Error,
-}; // union?
-
-typedef struct Token {
-  TokenType type;
-  string *lexeme;
-} Token;
-
-typedef unsigned short int u8; // I think?
-
-typedef struct Lexer { // represents the current token
-  u8 *start;
-  u8 *current;
-} Lexer;
-
-int is_whitespace(u8 token) { return 0; } // TODO
+int is_whitespace(u8 token) {
+  if (token == ' ' || token == '\n' || token == '\t' || token == '\r' ||
+      token == '\f' || token == '\v') {
+    return 1;
+  }
+  return 0;
+}
 
 Token lexer_make_token(Lexer *lexer, TokenType type) {
   Token tok;
   tok.type = type;
-  tok.lexeme = "";
+  tok.lexeme = (string){.ptr = lexer->start,
+                        .count = (u32)(lexer->current - lexer->start)};
   return tok;
 }
 
 int is_number(u8 n) {
-  return 0; // TODO
+  if (n >= '0' && n <= '9')
+    return 1;
+  return 0;
 }
 
 Token lexer_number(Lexer *lexer) {
-  while (is_number(lexer->current))
+  while (is_number(*lexer->current))
     lexer->current++;
   if (*lexer->current == '.') {
     lexer->current++;
-    while (is_number(lexer->current))
+    while (is_number(*lexer->current))
       lexer->current++;
   }
-  return Token{type : TokenType_Number, lexeme : lexer->current};
+  return lexer_make_token(lexer, TokenType_Number);
 }
 
 Token lexer_ident(Lexer *lexer) {
-  // TODO
+  return lexer_make_token(lexer, TokenType_Ident);
 }
 
 Token lexer_next_token(Lexer *lexer) {
@@ -95,6 +82,6 @@ Token lexer_next_token(Lexer *lexer) {
   default:
     if (is_alpha(*lexer->current))
       return lexer_ident(lexer); // TODO
-    return lexer_make_token(lexer, TokenType_Error)
+    return lexer_make_token(lexer, TokenType_Error);
   }
 }
